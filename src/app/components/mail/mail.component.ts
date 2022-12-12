@@ -93,9 +93,10 @@ export class MailComponent {
       err=>{
         console.log("Angular response error mailgun",err)
         Swal.fire('Mailgun Cli', `${err.message}<br /> <span class="font-weight-bold">Trying send with AWS SES.</span>`, 'error');
-        setTimeout(()=>{
+        const timeOut=setTimeout(()=>{
           this.sendWithAwsSes();
         },2000)
+        clearInterval(timeOut);
       }
     )
   }
@@ -112,9 +113,10 @@ export class MailComponent {
         console.log("Angular response error AWS SES",err)
         Swal.fire('AWS SES', `${err.message} <br /> <span class="font-weight-bold">Trying send with Mailgun.</span>`, 'error');
         
-        setTimeout(()=>{
+        const timeOut=setTimeout(()=>{
           this.sendWithMailgun();
         },3000)
+        clearInterval(timeOut);
       }
     )
  }
