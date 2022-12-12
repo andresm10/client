@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import {MailService} from '../../services/mail.service'
 import {Mail} from './../../interfaces/Mails'
-import {EmailResponse} from './../../interfaces/EmailResponse'
 import {AngularEditorConfig} from '@kolkov/angular-editor'
 import Swal from 'sweetalert2'
 
@@ -62,13 +61,11 @@ export class MailComponent {
     subject:'',
     to: '',
     from:'',
-    provider: ''
+    provider: 'aws-ses'
   };
   constructor(private readonly mailService: MailService){}
 
   sendEmail(){
-    console.log('provider',this.mail.provider);
-    
     switch(this.mail.provider){
       case 'aws-ses':
         this.sendWithAwsSes();
@@ -82,41 +79,57 @@ export class MailComponent {
     }
   }
 
+  isValid():boolean{
+    
+    return (this.mail.to.trim()=="" || this.mail.subject.trim()=="")?false:true;
+  }
+
+  isValidEmail():boolean{
+    const regexEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    return (!this.mail.to.match(regexEmail))?false:true;
+  }
+
   async sendWithMailgun(){
-    console.log('Angular request data',this.mail);
     this.mail.body=this.htmlContent
+    if(!this.isValid()){
+      Swal.fire("Bad request", "Please enter the required data", "error")
+      return;
+    }
+
+    if(!this.isValidEmail()){
+      Swal.fire("Bad request", "Invalid email", "error")
+      return;
+    }
     await this.mailService.sendWithMailgun(this.mail).subscribe(
       res=>{
-        console.log("Angular response mailgun",res)
         Swal.fire('Mailgun Cli', res.message, 'success');
       },
       err=>{
-        console.log("Angular response error mailgun",err)
         Swal.fire('Mailgun Cli', `${err.message}<br /> <span class="font-weight-bold">Trying send with AWS SES.</span>`, 'error');
-        const timeOut=setTimeout(()=>{
-          this.sendWithAwsSes();
-        },2000)
-        clearInterval(timeOut);
+        this.sendWithAwsSes();
       }
     )
   }
 
  async sendWithAwsSes(){
-    console.log('Angular request data',this.mail);
+    if(!this.isValid()){
+      Swal.fire("Bad request", "Please enter the required data", "error")
+      return;
+    }
+
+    if(!this.isValidEmail()){
+      Swal.fire("Bad request", "Invalid email", "error")
+      return;
+    }
+
     this.mail.body=this.htmlContent
     await this.mailService.sendWithAwsSes(this.mail).subscribe(
       res=>{
-        console.log("Angular response AWS SES",res)
         Swal.fire('AWS SES', res.message, 'success');
       },
       err=>{
-        console.log("Angular response error AWS SES",err)
         Swal.fire('AWS SES', `${err.message} <br /> <span class="font-weight-bold">Trying send with Mailgun.</span>`, 'error');
-        
-        const timeOut=setTimeout(()=>{
-          this.sendWithMailgun();
-        },3000)
-        clearInterval(timeOut);
+        this.sendWithMailgun();
       }
     )
  }
