@@ -14,6 +14,5 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-##
-AWS SES
-Email supports for
+## AWS SES **Important
+If you want receive emails with AWS SES provider, please send email to andresmajin7@gmail.com for add your email to white list
