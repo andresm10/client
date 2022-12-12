@@ -105,8 +105,19 @@ export class MailComponent {
         Swal.fire('Mailgun Cli', res.message, 'success');
       },
       err=>{
-        Swal.fire('Mailgun Cli', `${err.message}<br /> <span class="font-weight-bold">Trying send with AWS SES.</span>`, 'error');
-        this.sendWithAwsSes();
+        Swal.fire({
+          title: 'Mailgun Cli',
+          showDenyButton: true,
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+          denyButtonText: `Not`,
+          html: `${err.message}<br /> <span class="font-weight-bold">Do you want a send with AWS SES?.</span>`
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.sendWithAwsSes();
+          }
+        })
+
       }
     )
   }
@@ -128,8 +139,18 @@ export class MailComponent {
         Swal.fire('AWS SES', res.message, 'success');
       },
       err=>{
-        Swal.fire('AWS SES', `${err.message} <br /> <span class="font-weight-bold">Trying send with Mailgun.</span>`, 'error');
-        this.sendWithMailgun();
+        Swal.fire({
+          title: 'AWS SES',
+          showDenyButton: true,
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+          denyButtonText: `Not`,
+          html: `${err.message} <br /> <span class="font-weight-bold">Do you want a send with Mailgun?.</span>`
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.sendWithMailgun();
+          }
+        })
       }
     )
  }
