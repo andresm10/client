@@ -9,8 +9,7 @@ import {Observable} from 'rxjs'
 })
 export class MailService {
 
-  //BASE_URL: string = "https://chiper-backend.herokuapp.com";
-  BASE_URL: string = "http://localhost:3000";
+  BASE_URL: string = "https://chiper-backend.herokuapp.com";
 
   constructor(private readonly http: HttpClient) {}
 
